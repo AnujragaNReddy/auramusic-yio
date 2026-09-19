@@ -1,0 +1,82 @@
+.add-to-playlist {
+  position: relative;
+}
+
+.playlist-menu {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  z-index: 10;
+  backdrop-filter: blur(16px);
+}
+
+.playlist-menu-title {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  padding: 4px 8px 8px;
+}
+
+.playlist-menu-empty {
+  color: var(--text-faint);
+  font-size: 13px;
+  padding: 4px 8px 10px;
+}
+
+.playlist-menu-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13.5px;
+  text-align: left;
+}
+.playlist-menu-row:hover {
+  background: var(--surface-strong);
+}
+.playlist-menu-row:disabled {
+  color: var(--accent);
+  opacity: 0.9;
+}
+
+.playlist-menu-new {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.playlist-menu-new input {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+.playlist-menu-new button {
+  width: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-strong);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

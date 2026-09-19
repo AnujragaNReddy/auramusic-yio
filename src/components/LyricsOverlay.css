@@ -1,0 +1,45 @@
+.lyrics-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lyrics-backdrop {
+  position: absolute;
+  inset: -10%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(50px) brightness(0.3);
+  transform: scale(1.1);
+}
+.lyrics-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(9, 9, 13, 0.75);
+}
+.lyrics-content {
+  position: relative;
+  max-width: 420px;
+  text-align: center;
+  padding: 32px;
+}
+.lyrics-close {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+}
+.lyrics-icon {
+  color: var(--text-faint);
+  margin-bottom: 16px;
+}
+.lyrics-content h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+.lyrics-content p {
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.6;
+}

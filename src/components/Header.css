@@ -1,0 +1,78 @@
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px clamp(20px, 3vw, 40px);
+  background: var(--panel-bg);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header-title {
+  flex-shrink: 0;
+  min-width: 0;
+}
+.app-header-title h1 {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-header-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+}
+.app-header-search:focus-within {
+  border-color: var(--accent);
+  color: var(--text-dim);
+}
+.app-header-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.app-header-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-left: 4px;
+}
+
+@media (max-width: 720px) {
+  .app-header-title { display: none; }
+}

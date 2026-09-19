@@ -1,0 +1,115 @@
+.mini-player {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 900px;
+  height: var(--mini-player-h);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 12px 0 12px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  z-index: 40;
+  overflow: hidden;
+}
+
+.mini-progress-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--surface);
+}
+.mini-progress {
+  height: 100%;
+  transition: width 0.3s linear;
+}
+
+.mini-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+  text-align: left;
+  padding: 10px 4px 10px 4px;
+}
+
+.mini-art {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid var(--border);
+}
+
+.mini-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.mini-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mini-sub {
+  font-size: 12.5px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  padding-right: 6px;
+}
+.mini-controls .icon-btn.liked {
+  color: var(--brand-1);
+}
+.mini-controls .icon-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.play-btn {
+  background: var(--brand-1);
+  color: var(--on-brand);
+}
+.play-btn:hover {
+  background: var(--brand-1);
+  filter: brightness(1.12);
+}
+
+@media (max-width: 860px) {
+  /* Sit above the mobile bottom nav bar instead of overlapping it. */
+  .mini-player {
+    bottom: calc(70px + env(safe-area-inset-bottom, 0));
+  }
+}
+
+@media (max-width: 640px) {
+  .mini-sub {
+    display: none;
+  }
+  .expand-btn {
+    display: none;
+  }
+  .mini-player {
+    width: calc(100% - 20px);
+  }
+}

@@ -1,0 +1,113 @@
+.atmosphere-page {
+  margin-top: 8px;
+}
+
+.atmosphere-intro {
+  color: var(--text-dim);
+  font-size: 15px;
+  margin-bottom: 24px;
+  max-width: 520px;
+}
+
+.atmosphere-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.atmosphere-tile {
+  position: relative;
+  height: 120px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  background: linear-gradient(150deg, var(--tile-1), var(--tile-2));
+  transition: transform 0.2s var(--ease);
+}
+.atmosphere-tile:hover {
+  transform: translateY(-3px);
+}
+.atmosphere-tile.active {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+.atmosphere-tile-emoji {
+  font-size: 30px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+.atmosphere-tile-name {
+  font-weight: 800;
+  font-size: 14.5px;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.atmosphere-detail {
+  position: relative;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 32px;
+  overflow: hidden;
+}
+
+.atmosphere-glow {
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(circle at 20% 20%, var(--glow-1) 0%, transparent 55%),
+    radial-gradient(circle at 80% 80%, var(--glow-2) 0%, transparent 55%);
+  opacity: 0.28;
+  filter: blur(80px);
+  animation: atmosphere-drift 18s ease-in-out infinite;
+}
+@keyframes atmosphere-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(4%, -4%) scale(1.08); }
+}
+
+.atmosphere-detail-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+.atmosphere-detail-emoji {
+  font-size: 44px;
+}
+.atmosphere-detail-head h2 {
+  font-size: 26px;
+  letter-spacing: 0.02em;
+}
+.atmosphere-detail-head p {
+  color: var(--text-dim);
+  font-size: 14.5px;
+  margin-top: 4px;
+}
+
+.atmosphere-detail-actions {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.atmosphere-tracks {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 16px;
+}
+
+.atmosphere-hint {
+  color: var(--text-faint);
+  font-size: 14px;
+  text-align: center;
+  padding: 40px 0;
+}

@@ -1,0 +1,56 @@
+.aura-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.aura-blob {
+  position: absolute;
+  width: 55vw;
+  height: 55vw;
+  max-width: 640px;
+  max-height: 640px;
+  border-radius: 50%;
+  filter: blur(140px);
+  /* Kept deliberately subtle — this sits behind solid UI panels, not
+     content that needs to contrast against it directly. */
+  opacity: 0.16;
+  transition: background 1.4s ease;
+  will-change: transform;
+}
+
+.aura-blob-1 {
+  top: -15%;
+  left: -10%;
+  animation: float-a 22s ease-in-out infinite;
+}
+
+.aura-blob-2 {
+  bottom: -20%;
+  right: -10%;
+  animation: float-b 26s ease-in-out infinite;
+}
+
+.aura-blob.is-live {
+  opacity: 0.24;
+}
+
+@keyframes float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(6%, 8%) scale(1.15); }
+}
+
+@keyframes float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-8%, -6%) scale(1.1); }
+}
+
+.aura-grain {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 3px 3px;
+  mix-blend-mode: overlay;
+}

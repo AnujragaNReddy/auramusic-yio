@@ -1,0 +1,74 @@
+.search-hero {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 640px;
+  margin: 28px 0 26px;
+  padding: 14px 22px;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+.search-hero:focus-within {
+  border-color: var(--brand-1);
+  box-shadow: 0 0 0 3px rgba(255, 46, 110, 0.25);
+}
+.search-hero input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text);
+  font-size: 16px;
+}
+.search-hero-btn {
+  padding: 9px 20px;
+  border-radius: 999px;
+  background: var(--brand-1);
+  color: var(--on-brand);
+  font-weight: 800;
+  font-size: 13.5px;
+  flex-shrink: 0;
+}
+
+.search-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dim);
+  margin: 26px 0 14px;
+}
+
+.empty-state-inline {
+  color: var(--text-faint);
+  font-size: 13.5px;
+  margin-bottom: 18px;
+}
+
+.empty-state-inline.resolve-error {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #ffb27a;
+}
+
+.resolve-error-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--brand-1);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px 16px;
+  margin-bottom: 8px;
+}
+
+.search-grid .song-card {
+  width: 100%;
+}

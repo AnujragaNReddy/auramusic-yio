@@ -1,0 +1,138 @@
+.discover-page {
+  margin-top: 8px;
+}
+
+.discover-subtitle {
+  color: var(--text-dim);
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+.mood-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  margin-bottom: 24px;
+}
+
+.mood-chip {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.mood-chip.active {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: transparent;
+}
+
+.discover-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 16px;
+  margin-bottom: 12px;
+}
+
+.new-release-row {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 900px) {
+  .new-release-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.new-release-feature {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 260px;
+  display: flex;
+  align-items: flex-end;
+}
+.new-release-feature img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.5);
+}
+.new-release-feature-info {
+  position: relative;
+  padding: 24px;
+}
+.new-release-feature-info h3 {
+  font-size: 26px;
+  margin: 6px 0 6px;
+}
+.new-release-feature-info p {
+  color: var(--text-dim);
+  font-size: 13.5px;
+  margin-bottom: 16px;
+}
+
+.new-release-more {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.trending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trending-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  width: 100%;
+}
+.trending-row:hover {
+  background: var(--surface);
+}
+
+.trending-rank {
+  width: 28px;
+  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.trending-row img {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.trending-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.trending-title {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trending-artist {
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
