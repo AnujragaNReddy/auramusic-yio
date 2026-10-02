@@ -1,16 +1,17 @@
 // JioSaavn has no official public API. This talks to a community-run,
 // unofficial wrapper (https://saavn.sumit.co) that mirrors JioSaavn's own
-// internal endpoints for metadata — song/artist/album names, artwork,
-// language, year. It is NOT run by us or by JioSaavn, so it can go down,
-// rate-limit, or change shape without notice; every call here degrades to
-// an empty result rather than throwing.
+// internal endpoints — metadata (song/artist/album names, artwork,
+// language, year) AND the actual streamable audio files (`downloadUrl`).
+// It is NOT run by us or by JioSaavn, so it can go down, rate-limit, or
+// change shape without notice; every search degrades to an empty result
+// rather than throwing.
 //
-// Deliberately unused: this API also returns direct `downloadUrl` links to
-// JioSaavn's actual audio files. We never read or expose that field —
-// playback in this app only ever happens through YouTube's own official
-// embedded player (see api/youtube.js + store/PlayerContext.jsx). Using
-// JioSaavn's metadata to describe a song is a reasonable gray area; piping
-// their licensed audio through our own player would not be.
+// Streaming JioSaavn's own licensed audio directly — rather than embedding
+// YouTube's official player, which is explicitly permitted by YouTube's
+// terms — is a real legal gray area. This app used to deliberately avoid
+// it for exactly that reason (see git history). It's used anyway now, by
+// choice, to get playback working without depending on any API key or
+// quota.
 const BASE = 'https://saavn.sumit.co/api';
 
 async function saavnFetch(path, params) {
@@ -23,19 +24,34 @@ async function saavnFetch(path, params) {
   return body.data;
 }
 
+// `downloadUrl` is an array of {quality, url} from lowest (12kbps) to
+// highest (320kbps) bitrate, all AAC-in-MP4 (plays fine in a plain <audio>
+// element). 160kbps is a good default — close to CD quality without being
+// wastefully large — falling back to whatever's available if that exact
+// tier is missing.
+function pickAudioUrl(downloadUrl) {
+  if (!downloadUrl?.length) return '';
+  const preferred = downloadUrl.find((d) => d.quality === '160kbps');
+  return (preferred || downloadUrl[downloadUrl.length - 1])?.url || '';
+}
+
 function mapSong(s) {
   const artist = s.artists?.primary?.map((a) => a.name).join(', ') || s.subtitle || 'Unknown artist';
   const image = s.image?.[s.image.length - 1]?.url || s.image?.[0]?.url || '';
   return {
-    source: 'jiosaavn',
-    jiosaavnId: s.id,
+    id: s.id,
     title: s.name,
     artist,
+    channel: artist,
     album: s.album?.name || '',
     language: s.language,
     year: s.year,
     durationSec: s.duration,
-    image,
+    thumbnail: image,
+    // Convenience only — PlayerContext always re-resolves a fresh URL by
+    // `id` right before playing (see getJioSaavnSongById) rather than
+    // trusting this one, so a track saved hours/days ago still plays.
+    url: pickAudioUrl(s.downloadUrl),
   };
 }
 
@@ -54,20 +70,81 @@ function mapAlbum(a) {
   };
 }
 
-export async function searchJioSaavnSongs(query, { limit = 20 } = {}) {
+// Repeat searches are cached locally purely for snappiness — there's no
+// quota or key to protect here, unlike the old YouTube-backed search — and
+// so concurrent duplicate calls (e.g. React re-renders) don't double-fetch.
+const CACHE_KEY = 'aura.search-cache.v2';
+const CACHE_TTL_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+const inFlight = new Map();
+
+function readCache() {
   try {
-    const data = await saavnFetch('/search/songs', { query, limit });
-    return (data?.results || []).map(mapSong);
+    return JSON.parse(localStorage.getItem(CACHE_KEY)) || {};
   } catch {
-    return [];
+    return {};
   }
 }
 
-export async function searchJioSaavnAlbums(query, { limit = 10 } = {}) {
+function writeCache(cache) {
   try {
-    const data = await saavnFetch('/search/albums', { query, limit });
-    return (data?.results || []).map(mapAlbum);
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
   } catch {
-    return [];
+    /* storage full or unavailable — caching is a best-effort optimization */
   }
+}
+
+function cached(key, fetcher) {
+  const cache = readCache();
+  const entry = cache[key];
+  if (entry && Date.now() - entry.at < CACHE_TTL_MS) return Promise.resolve(entry.result);
+  if (inFlight.has(key)) return inFlight.get(key);
+
+  const promise = fetcher()
+    .then((result) => {
+      const next = readCache();
+      next[key] = { at: Date.now(), result };
+      writeCache(next);
+      inFlight.delete(key);
+      return result;
+    })
+    .catch((err) => {
+      inFlight.delete(key);
+      throw err;
+    });
+  inFlight.set(key, promise);
+  return promise;
+}
+
+export async function searchJioSaavnSongs(query, { limit = 20 } = {}) {
+  return cached(`songs::${query}::${limit}`, async () => {
+    try {
+      const data = await saavnFetch('/search/songs', { query, limit });
+      return (data?.results || []).map(mapSong);
+    } catch {
+      return [];
+    }
+  });
+}
+
+export async function searchJioSaavnAlbums(query, { limit = 10 } = {}) {
+  return cached(`albums::${query}::${limit}`, async () => {
+    try {
+      const data = await saavnFetch('/search/albums', { query, limit });
+      return (data?.results || []).map(mapAlbum);
+    } catch {
+      return [];
+    }
+  });
+}
+
+// Fetches one song fresh by its permanent JioSaavn id — used by
+// PlayerContext right before playing, so every track (search result,
+// curated pick, or something saved to Liked/Playlists days ago) always
+// gets a current `downloadUrl` rather than a possibly-stale baked-in one.
+// Deliberately not cached, for the same reason.
+export async function getJioSaavnSongById(id) {
+  const data = await saavnFetch(`/songs/${encodeURIComponent(id)}`, {});
+  const song = Array.isArray(data) ? data[0] : data;
+  if (!song) throw new Error('Song not found');
+  return mapSong(song);
 }

@@ -3,7 +3,6 @@ import { Play, Shuffle } from 'lucide-react';
 import { getFeaturedAtmosphere } from '../lib/atmospheres.js';
 import { MADE_FOR_YOU_WITH_TRACKS } from '../lib/madeForYou.js';
 import { CURATED_TRACKS } from '../lib/curatedSongs.js';
-import { hasApiKey } from '../api/youtube.js';
 import { useLibrary } from '../store/LibraryContext.jsx';
 import { usePlayer } from '../store/PlayerContext.jsx';
 import CollectionCard from '../components/CollectionCard.jsx';
@@ -87,11 +86,7 @@ export default function HomePage() {
       )}
 
       <p className="home-hint">
-        {hasApiKey ? (
-          <>Looking for something else? <Link to="/search">Search any song</Link>.</>
-        ) : (
-          <>Want to search beyond this starter catalog? <Link to="/settings">Add a free YouTube API key</Link>.</>
-        )}
+        Looking for something else? <Link to="/search">Search any song</Link>.
       </p>
     </div>
   );

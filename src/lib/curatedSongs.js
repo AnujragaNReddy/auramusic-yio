@@ -1,61 +1,56 @@
 // A hand-picked, individually-verified catalog so Home and most searches
-// work with zero YouTube Data API calls (no quota, no key required at all).
-// Each video id was checked against YouTube's free oEmbed endpoint to
-// confirm it exists and is embeddable before being added here. The Data
-// API (quota-limited to ~100 searches/day) only gets hit for songs outside
-// this list.
+// work instantly with zero network round-trips for the initial render.
+// Each JioSaavn id was checked against the live search API — by title AND
+// artist, not just title text — to confirm it resolves to the real master
+// recording (not a cover, karaoke version, or instrumental) before being
+// added here.
+//
+// English was dropped from this catalog entirely: JioSaavn's unofficial
+// catalog (at least via the wrapper this app uses) does not carry real
+// masters for the vast majority of global Western pop hits — searches for
+// Blinding Lights, Shape of You, Perfect, Levitating, Someone Like You,
+// Uptown Funk, As It Was, and Stay all resolved only to karaoke/cover/
+// instrumental uploads sharing the same title, confirmed across ~15 major
+// English songs tested. Telugu, Tamil, and Hindi all matched cleanly.
 export const CURATED_SONGS = [
   // Telugu
-  { id: '4_eEgJhsBMo', title: 'Naatu Naatu', artist: 'Rahul Sipligunj, Kaala Bhairava', album: 'RRR', language: 'telugu' },
-  { id: 'uBDCl5c-9qM', title: 'Komuram Bheemudo', artist: 'Kaala Bhairava', album: 'RRR', language: 'telugu' },
-  { id: '_1BbDhiiV6A', title: 'Srivalli', artist: 'Sid Sriram', album: 'Pushpa', language: 'telugu' },
-  { id: 'vdY5SFZBgnk', title: 'Saami Saami', artist: 'Mounika Yadav', album: 'Pushpa', language: 'telugu' },
-  { id: 'x5OfM36VAHI', title: 'Oo Antava', artist: 'Indravathi Chauhan', album: 'Pushpa', language: 'telugu' },
-  { id: 'aRGaUZm1_Zg', title: 'Butta Bomma', artist: 'Armaan Malik', album: 'Ala Vaikunthapurramuloo', language: 'telugu' },
-  { id: 'f0QEhTJV8L4', title: 'Ramuloo Ramulaa', artist: 'Anurag Kulkarni, Mangli', album: 'Ala Vaikunthapurramuloo', language: 'telugu' },
-  { id: 'tflQ33g6I8I', title: 'Samajavaragamana', artist: 'Sid Sriram', album: 'Ala Vaikunthapurramuloo', language: 'telugu' },
+  { id: '-JkPBIE7', title: 'Naatu Naatu', artist: 'Rahul Sipligunj, Kaala Bhairava', album: 'RRR', language: 'telugu', image: 'https://c.saavncdn.com/683/RRR-Telugu-Telugu-2022-20250828171313-500x500.jpg' },
+  { id: 'lPFUlQgU', title: 'Komuram Bheemudo', artist: 'Kaala Bhairava', album: 'RRR', language: 'telugu', image: 'https://c.saavncdn.com/683/RRR-Telugu-Telugu-2022-20250828171313-500x500.jpg' },
+  { id: '4r-wShBa', title: 'Srivalli', artist: 'Sid Sriram', album: 'Pushpa', language: 'telugu', image: 'https://c.saavncdn.com/blob/056/Pushpa-The-Rise-Telugu-2021-20211216115409-500x500.jpg' },
+  { id: 'OByN1gHS', title: 'Saami Saami', artist: 'Mounika Yadav', album: 'Pushpa', language: 'telugu', image: 'https://c.saavncdn.com/blob/056/Pushpa-The-Rise-Telugu-2021-20211216115409-500x500.jpg' },
+  { id: 'QOaKBiVi', title: 'Oo Antava', artist: 'Indravathi Chauhan', album: 'Pushpa', language: 'telugu', image: 'https://c.saavncdn.com/blob/056/Pushpa-The-Rise-Telugu-2021-20211216115409-500x500.jpg' },
+  { id: '1UqsPO7u', title: 'Butta Bomma', artist: 'Armaan Malik', album: 'Ala Vaikunthapurramuloo', language: 'telugu', image: 'https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg' },
+  { id: 'WrGU-iqE', title: 'Ramuloo Ramulaa', artist: 'Anurag Kulkarni, Mangli', album: 'Ala Vaikunthapurramuloo', language: 'telugu', image: 'https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg' },
+  { id: 'RpFeTE8x', title: 'Samajavaragamana', artist: 'Sid Sriram', album: 'Ala Vaikunthapurramuloo', language: 'telugu', image: 'https://c.saavncdn.com/537/Tremendous-Tunes-Of-Thaman-Telugu-2019-20191113135643-500x500.jpg' },
 
   // Tamil
-  { id: 'fRD_3vJagxk', title: 'Vaathi Coming', artist: 'Anirudh Ravichander', album: 'Master', language: 'tamil' },
-  { id: 'bofvLylz_N8', title: 'Kutti Story', artist: 'Vijay, Anirudh Ravichander', album: 'Master', language: 'tamil' },
-  { id: 'KUN5Uf9mObQ', title: 'Arabic Kuthu', artist: 'Anirudh, Jonita Gandhi', album: 'Beast', language: 'tamil' },
-  { id: 'x6Q7c9RyMzk', title: 'Rowdy Baby', artist: 'Dhanush, Dhee', album: 'Maari 2', language: 'tamil' },
-  { id: 'YR12Z8f1Dh8', title: 'Why This Kolaveri Di', artist: 'Dhanush', album: '3', language: 'tamil' },
-  { id: '88iypMO9H7g', title: 'Marana Mass', artist: 'Anirudh Ravichander', album: 'Petta', language: 'tamil' },
-  { id: 'xZ92nnR1Pt8', title: 'Selfie Pulla', artist: 'Vijay, Sunidhi Chauhan', album: 'Kaththi', language: 'tamil' },
-  { id: 'eYq7WapuDLU', title: 'Enjoy Enjaami', artist: 'Dhee, Arivu', album: 'Enjoy Enjaami', language: 'tamil' },
+  { id: 'IJ3C0q7f', title: 'Vaathi Coming', artist: 'Anirudh Ravichander', album: 'Master', language: 'tamil', image: 'https://c.saavncdn.com/347/Master-Tamil-2020-20200316084627-500x500.jpg' },
+  { id: 'L6UDHuug', title: 'Kutti Story', artist: 'Vijay, Anirudh Ravichander', album: 'Master', language: 'tamil', image: 'https://c.saavncdn.com/347/Master-Tamil-2020-20200316084627-500x500.jpg' },
+  { id: 'zYTbChor', title: 'Arabic Kuthu', artist: 'Anirudh, Jonita Gandhi', album: 'Beast', language: 'tamil', image: 'https://c.saavncdn.com/735/AiSh-Vol-7-Punjabi-2022-20250701222620-500x500.jpg' },
+  { id: 'jS9GUMPM', title: 'Rowdy Baby', artist: 'Dhanush, Dhee', album: 'Maari 2', language: 'tamil', image: 'https://c.saavncdn.com/060/Best-Of-Dhanush-Tamil-2019-20190716135614-500x500.jpg' },
+  { id: 'o-IsoK2n', title: 'Why This Kolaveri Di', artist: 'Dhanush', album: '3', language: 'tamil', image: 'https://c.saavncdn.com/932/3-Hindi-2012-500x500.jpg' },
+  { id: 'zBvFVakZ', title: 'Marana Mass', artist: 'Anirudh Ravichander', album: 'Petta', language: 'tamil', image: 'https://c.saavncdn.com/166/Petta-Tamil-2018-20181210095910-500x500.jpg' },
+  { id: '456BcuDS', title: 'Selfie Pulla', artist: 'Vijay, Sunidhi Chauhan', album: 'Kaththi', language: 'tamil', image: 'https://c.saavncdn.com/689/Kaththi-Tamil-2025-20250930143442-500x500.jpg' },
+  { id: 'x2z_VPDG', title: 'Enjoy Enjaami', artist: 'Dhee, Arivu', album: 'Enjoy Enjaami', language: 'tamil', image: 'https://c.saavncdn.com/940/Enjoy-Enjaami-Tamil-2021-20260227060111-500x500.jpg' },
 
   // Hindi
-  { id: 'NJAv_7lHUIU', title: 'Kesariya', artist: 'Arijit Singh', album: 'Brahmastra', language: 'hindi' },
-  { id: 'IJq0yyWug1k', title: 'Tum Hi Ho', artist: 'Arijit Singh', album: 'Aashiqui 2', language: 'hindi' },
-  { id: 'wBtBSmWSP_s', title: 'Apna Bana Le', artist: 'Arijit Singh', album: 'Bhediya', language: 'hindi' },
-  { id: 'gvyUuxdRdR4', title: 'Raataan Lambiyan', artist: 'Tanishk Bagchi, Jubin Nautiyal, Asees Kaur', album: 'Shershaah', language: 'hindi' },
-  { id: 'LHEU3tE_biU', title: 'Chaleya', artist: 'Arijit Singh, Shilpa Rao', album: 'Jawan', language: 'hindi' },
-  { id: 'avVg3pLj_Po', title: 'Tera Ban Jaunga', artist: 'Tulsi Kumar, Akhil Sachdeva', album: 'Kabir Singh', language: 'hindi' },
-  { id: 'qFkNATtc3mc', title: 'Ghungroo', artist: 'Arijit Singh, Shilpa Rao', album: 'War', language: 'hindi' },
-
-  // English
-  { id: '4NRXx6U8ABQ', title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', language: 'english' },
-  { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran', album: '÷ (Divide)', language: 'english' },
-  { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran', album: '÷ (Divide)', language: 'english' },
-  { id: 'qUiMD_Cm8hw', title: 'Levitating', artist: 'Dua Lipa', album: 'Future Nostalgia', language: 'english' },
-  { id: 'hLQl3WQQoQ0', title: 'Someone Like You', artist: 'Adele', album: '21', language: 'english' },
-  { id: 'OPf0YbXqDm0', title: 'Uptown Funk', artist: 'Mark Ronson, Bruno Mars', album: 'Uptown Special', language: 'english' },
-  { id: 'H5v3kku4y6Q', title: 'As It Was', artist: 'Harry Styles', album: "Harry's House", language: 'english' },
-  { id: 'kTJczUoc26U', title: 'Stay', artist: 'The Kid LAROI, Justin Bieber', album: 'Stay', language: 'english' },
+  { id: 'rjkrTnma', title: 'Kesariya', artist: 'Arijit Singh', album: 'Brahmastra', language: 'hindi', image: 'https://c.saavncdn.com/871/Brahmastra-Original-Motion-Picture-Soundtrack-Hindi-2022-20221006155213-500x500.jpg' },
+  { id: 'aRZbUYD7', title: 'Tum Hi Ho', artist: 'Arijit Singh', album: 'Aashiqui 2', language: 'hindi', image: 'https://c.saavncdn.com/430/Aashiqui-2-Hindi-2013-500x500.jpg' },
+  { id: 'lnig1Z0j', title: 'Apna Bana Le', artist: 'Arijit Singh', album: 'Bhediya', language: 'hindi', image: 'https://c.saavncdn.com/221/Soulful-Hits-Hindi-2026-20260529163806-500x500.jpg' },
+  { id: 'mPTrDSun', title: 'Raataan Lambiyan', artist: 'Tanishk Bagchi, Jubin Nautiyal, Asees Kaur', album: 'Shershaah', language: 'hindi', image: 'https://c.saavncdn.com/238/Shershaah-Original-Motion-Picture-Soundtrack--Hindi-2021-20210815181610-500x500.jpg' },
+  { id: 'faloMmjX', title: 'Chaleya', artist: 'Arijit Singh, Shilpa Rao', album: 'Jawan', language: 'hindi', image: 'https://c.saavncdn.com/047/Jawan-Hindi-2023-20230921190854-500x500.jpg' },
+  { id: 'uf2JX_12', title: 'Tera Ban Jaunga', artist: 'Tulsi Kumar, Akhil Sachdeva', album: 'Kabir Singh', language: 'hindi', image: 'https://c.saavncdn.com/807/Kabir-Singh-Hindi-2019-20240131131003-500x500.jpg' },
+  { id: '1I2Ua0sr', title: 'Ghungroo', artist: 'Arijit Singh, Shilpa Rao', album: 'War', language: 'hindi', image: 'https://c.saavncdn.com/881/War-Hindi-2019-20191001104931-500x500.jpg' },
 ];
-
-export function thumbnailFor(id) {
-  return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-}
 
 // `channel` is kept as the display subtitle used everywhere a track renders
 // (SongCard, MiniPlayer, etc.) so every card in the app — curated or
-// search-sourced — has the same shape.
+// search-sourced — has the same shape. `thumbnail` mirrors `image` for the
+// same reason (search results use `thumbnail`).
 export const CURATED_TRACKS = CURATED_SONGS.map((song) => ({
   ...song,
   channel: song.artist,
-  thumbnail: thumbnailFor(song.id),
+  thumbnail: song.image,
 }));
 
 // Grouped by album/movie soundtrack for the Albums tab.

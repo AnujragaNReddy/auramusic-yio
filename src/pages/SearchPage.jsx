@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search as SearchIcon, SearchX, AlertCircle, ExternalLink } from 'lucide-react';
-import { hasApiKey, resolveToPlayableTrack } from '../api/youtube.js';
+import { Search as SearchIcon, SearchX } from 'lucide-react';
 import { searchJioSaavnSongs } from '../api/jiosaavn.js';
 import { CURATED_TRACKS, CURATED_ALBUMS } from '../lib/curatedSongs.js';
 import { usePlayer } from '../store/PlayerContext.jsx';
@@ -31,8 +30,6 @@ export default function SearchPage() {
   const query = params.get('q') || '';
   const [input, setInput] = useState(query);
   const [saavnResults, setSaavnResults] = useState(null);
-  const [resolvingId, setResolvingId] = useState(null);
-  const [resolveError, setResolveError] = useState(null);
   const { currentTrack, isPlaying, playQueue } = usePlayer();
 
   useEffect(() => setInput(query), [query]);
@@ -40,13 +37,11 @@ export default function SearchPage() {
   const curatedMatches = useMemo(() => searchCurated(query), [query]);
   const albumMatches = useMemo(() => searchAlbums(query), [query]);
 
-  // JioSaavn powers discovery here — free, accurate, no quota — but never
-  // supplies anything playable. Actual playback is still resolved to a real
-  // YouTube video lazily, only when a specific result is clicked.
+  // JioSaavn results are directly playable now — no bridge to anything
+  // else needed before a result can go into the queue.
   useEffect(() => {
     if (!query) return;
     setSaavnResults(null);
-    setResolveError(null);
     searchJioSaavnSongs(query, { limit: 24 }).then(setSaavnResults);
   }, [query]);
 
@@ -54,19 +49,6 @@ export default function SearchPage() {
     e.preventDefault();
     if (!input.trim()) return;
     navigate(`/search?q=${encodeURIComponent(input.trim())}`);
-  }
-
-  async function handlePlaySaavnTrack(track) {
-    setResolvingId(track.jiosaavnId);
-    setResolveError(null);
-    try {
-      const resolved = await resolveToPlayableTrack(track);
-      playQueue([resolved], 0);
-    } catch (err) {
-      setResolveError({ message: err.message, track });
-    } finally {
-      setResolvingId(null);
-    }
   }
 
   const noResultsYet = query && saavnResults !== null && saavnResults.length === 0 && curatedMatches.length === 0 && albumMatches.length === 0;
@@ -85,21 +67,6 @@ export default function SearchPage() {
       </form>
 
       {!query && <ExploreTiles onPick={(term) => navigate(`/search?q=${encodeURIComponent(term)}`)} />}
-
-      {resolveError && (
-        <p className="empty-state-inline resolve-error">
-          <AlertCircle size={15} /> {resolveError.message}
-          {' '}
-          <a
-            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${resolveError.track.title} ${resolveError.track.artist}`)}`}
-            target="_blank"
-            rel="noreferrer"
-            className="resolve-error-link"
-          >
-            Open on YouTube instead <ExternalLink size={12} />
-          </a>
-        </p>
-      )}
 
       {query && albumMatches.length > 0 && (
         <>
@@ -150,26 +117,17 @@ export default function SearchPage() {
             </div>
           )}
           {saavnResults?.length > 0 && (
-            <>
-              <p className="empty-state-inline">Tap a song to find and play it — this looks it up on YouTube the first time only.</p>
-              <div className="search-grid">
-                {saavnResults.map((track) => (
-                  <SongCard
-                    key={track.jiosaavnId}
-                    track={track}
-                    isActive={currentTrack?.title === track.title && currentTrack?.artist === track.artist}
-                    isPlaying={isPlaying}
-                    resolving={resolvingId === track.jiosaavnId}
-                    onPlay={() => handlePlaySaavnTrack(track)}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-          {!hasApiKey && (
-            <p className="empty-state-inline">
-              Add a free YouTube API key to actually play these — see the setup note on the Home page.
-            </p>
+            <div className="search-grid">
+              {saavnResults.map((track, i) => (
+                <SongCard
+                  key={track.id}
+                  track={track}
+                  isActive={currentTrack?.id === track.id}
+                  isPlaying={isPlaying}
+                  onPlay={() => playQueue(saavnResults, i)}
+                />
+              ))}
+            </div>
           )}
         </>
       )}

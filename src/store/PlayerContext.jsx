@@ -1,48 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { extractAura } from '../lib/colorExtract.js';
+import { getJioSaavnSongById } from '../api/jiosaavn.js';
 import { useLibrary } from './LibraryContext.jsx';
 
 const PlayerContext = createContext(null);
-const CONTAINER_ID = 'aura-yt-player';
 const DEFAULT_AURA = { primary: 'rgb(124, 140, 255)', secondary: 'rgb(124, 140, 255)' };
-
-// The YouTube IFrame API player object can be in a partially-initialized
-// state (or missing a method entirely, e.g. if a browser extension blocked
-// part of the embed) even after it's assigned to our ref. Calling a missing
-// method threw an uncaught TypeError that crashed the whole React tree with
-// no error boundary — this guards every call so a flaky embed degrades
-// instead of blanking the page.
-function safeCall(player, method, ...args) {
-  try {
-    if (player && typeof player[method] === 'function') {
-      return player[method](...args);
-    }
-  } catch (err) {
-    console.warn(`Aura: player.${method}() failed`, err);
-  }
-  return undefined;
-}
-
-function loadYouTubeApi() {
-  return new Promise((resolve) => {
-    if (window.YT && window.YT.Player) return resolve(window.YT);
-    const previous = window.onYouTubeIframeAPIReady;
-    window.onYouTubeIframeAPIReady = () => {
-      previous?.();
-      resolve(window.YT);
-    };
-    if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.head.appendChild(tag);
-    }
-  });
-}
 
 export function PlayerProvider({ children }) {
   const { addRecent } = useLibrary();
-  const playerRef = useRef(null);
-  const [ready, setReady] = useState(false);
+  const audioRef = useRef(null);
 
   const [queue, setQueue] = useState([]);
   const [index, setIndex] = useState(-1);
@@ -73,101 +39,81 @@ export function PlayerProvider({ children }) {
     noticeTimerRef.current = setTimeout(() => setNotice(null), 4000);
   }, []);
 
-  // Boot the (invisible) YouTube IFrame player once.
+  // Wire up the real <audio> element's events once.
   useEffect(() => {
-    let cancelled = false;
-    const readyTimeout = setTimeout(() => {
-      if (!cancelled && !playerRef.current?.getPlayerState) {
-        showNotice('The YouTube player didn’t load — an ad blocker or privacy extension may be blocking it. Try disabling extensions or an incognito window.');
+    const audio = audioRef.current;
+    audio.volume = volume / 100;
+
+    const onTimeUpdate = () => setPosition(audio.currentTime);
+    const onLoadedMetadata = () => setDuration(audio.duration || 0);
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    const onEnded = () => {
+      if (repeatModeRef.current === 'one') {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      } else {
+        nextRef.current();
       }
-    }, 6000);
-    loadYouTubeApi().then((YT) => {
-      if (cancelled) return;
-      playerRef.current = new YT.Player(CONTAINER_ID, {
-        height: '1',
-        width: '1',
-        playerVars: {
-          autoplay: 0,
-          controls: 0,
-          disablekb: 1,
-          playsinline: 1,
-          modestbranding: 1,
-          // Required for the player's postMessage command channel to work
-          // reliably, especially on non-standard localhost ports — without
-          // it, play/pause/load calls can silently fail even though the
-          // player object itself loads fine.
-          origin: window.location.origin,
-        },
-        events: {
-          onReady: () => {
-            clearTimeout(readyTimeout);
-            safeCall(playerRef.current, 'setVolume', volume);
-            setReady(true);
-          },
-          onStateChange: (e) => {
-            if (e.data === YT.PlayerState.PLAYING) setIsPlaying(true);
-            if (e.data === YT.PlayerState.PAUSED) setIsPlaying(false);
-            if (e.data === YT.PlayerState.ENDED) {
-              if (repeatModeRef.current === 'one') {
-                safeCall(playerRef.current, 'seekTo', 0, true);
-                safeCall(playerRef.current, 'playVideo');
-              } else {
-                nextRef.current();
-              }
-            }
-          },
-          // Many official label uploads disallow embedding (error 101/150) —
-          // without this, clicking such a song just does nothing forever.
-          onError: (e) => {
-            const messages = {
-              2: 'Invalid video — skipping...',
-              5: 'Playback error — skipping...',
-              100: 'This video is unavailable — skipping...',
-              101: "This song's owner disabled playback outside YouTube — skipping...",
-              150: "This song's owner disabled playback outside YouTube — skipping...",
-            };
-            showNotice(messages[e.data] || 'Could not play this song — skipping...');
-            nextRef.current();
-          },
-        },
-      });
-    });
+    };
+    const onError = () => {
+      showNotice('Could not play this song — skipping...');
+      nextRef.current();
+    };
+
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('loadedmetadata', onLoadedMetadata);
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+    audio.addEventListener('ended', onEnded);
+    audio.addEventListener('error', onError);
     return () => {
-      cancelled = true;
-      clearTimeout(readyTimeout);
+      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('ended', onEnded);
+      audio.removeEventListener('error', onError);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Poll playback position — the IFrame API has no time-update event.
-  useEffect(() => {
-    if (!ready) return undefined;
-    const id = setInterval(() => {
-      const p = playerRef.current;
-      const time = safeCall(p, 'getCurrentTime');
-      if (typeof time === 'number') setPosition(time);
-      const d = safeCall(p, 'getDuration');
-      if (d) setDuration(d);
-    }, 500);
-    return () => clearInterval(id);
-  }, [ready]);
-
-  // Load whichever track `index` points to into the real player. Guarded by
-  // lastLoadedRef so editing the queue (e.g. removing an earlier track, which
-  // shifts `index` without changing what's actually playing) doesn't restart
-  // the currently-playing video.
+  // Load whichever track `index` points to: re-resolve a fresh playable URL
+  // by JioSaavn id (never trust a possibly-stale baked-in one, since this
+  // runs for curated picks and tracks saved days ago too, not just fresh
+  // search results) and hand it to the real <audio> element. Guarded by
+  // lastLoadedRef so editing the queue (e.g. removing an earlier track,
+  // which shifts `index` without changing what's actually playing) doesn't
+  // restart the currently-playing song.
   const lastLoadedRef = useRef(null);
   useEffect(() => {
     const track = queue[index];
-    if (!track || !playerRef.current || !ready) return;
-    if (lastLoadedRef.current === track.id) return;
+    const audio = audioRef.current;
+    if (!track || !audio) return undefined;
+    if (lastLoadedRef.current === track.id) return undefined;
     lastLoadedRef.current = track.id;
-    safeCall(playerRef.current, 'loadVideoById', track.id);
     setPosition(0);
     setDuration(0);
-    addRecent(track);
+
+    let cancelled = false;
+    getJioSaavnSongById(track.id)
+      .then((resolved) => {
+        if (cancelled || lastLoadedRef.current !== track.id) return;
+        if (!resolved.url) throw new Error('No playable audio for this song');
+        audio.src = resolved.url;
+        audio.play().catch(() => {});
+        addRecent(track);
+      })
+      .catch(() => {
+        if (cancelled || lastLoadedRef.current !== track.id) return;
+        showNotice("Couldn't find a playable version of this song — skipping...");
+        nextRef.current();
+      });
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index, queue, ready]);
+  }, [index, queue]);
 
   // Re-derive the Aura glow colors whenever the track changes.
   useEffect(() => {
@@ -232,9 +178,9 @@ export function PlayerProvider({ children }) {
   }, [index]);
 
   const togglePlay = useCallback(() => {
-    const p = playerRef.current;
-    if (isPlaying) safeCall(p, 'pauseVideo');
-    else safeCall(p, 'playVideo');
+    const audio = audioRef.current;
+    if (isPlaying) audio.pause();
+    else audio.play().catch(() => {});
   }, [isPlaying]);
 
   // Space bar toggles play/pause from anywhere, like every real media app —
@@ -253,13 +199,14 @@ export function PlayerProvider({ children }) {
   }, [togglePlay, queue.length]);
 
   const seekTo = useCallback((seconds) => {
-    safeCall(playerRef.current, 'seekTo', seconds, true);
+    const audio = audioRef.current;
+    audio.currentTime = seconds;
     setPosition(seconds);
   }, []);
 
   const setVolume = useCallback((v) => {
     setVolumeState(v);
-    safeCall(playerRef.current, 'setVolume', v);
+    audioRef.current.volume = v / 100;
   }, []);
 
   const addToQueue = useCallback((track) => {
@@ -267,7 +214,6 @@ export function PlayerProvider({ children }) {
   }, []);
 
   const value = {
-    ready,
     queue,
     index,
     currentTrack,
@@ -304,7 +250,7 @@ export function PlayerProvider({ children }) {
   return (
     <PlayerContext.Provider value={value}>
       {children}
-      <div id={CONTAINER_ID} style={{ position: 'fixed', bottom: 0, left: 0, width: 1, height: 1, opacity: 0, pointerEvents: 'none' }} />
+      <audio ref={audioRef} preload="auto" />
     </PlayerContext.Provider>
   );
 }
