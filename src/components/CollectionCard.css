@@ -38,14 +38,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  transform: translateY(6px);
+  opacity: 0.9;
+  transform: translateY(0);
   transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
-.collection-card:hover .collection-card-play {
-  opacity: 1;
-  transform: translateY(0);
+/* Touch devices get the always-visible default above (no hover to reveal
+   it otherwise); only hide-until-hover (with the little rise-in) on a
+   real mouse/trackpad. */
+@media (hover: hover) and (pointer: fine) {
+  .collection-card-play {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  .collection-card:hover .collection-card-play {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .collection-card-title {

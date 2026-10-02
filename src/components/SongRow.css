@@ -77,10 +77,17 @@
   position: static;
 }
 .song-row-menu .song-menu-trigger {
-  opacity: 0;
+  opacity: 0.85;
 }
-.song-row:hover .song-row-menu .song-menu-trigger {
-  opacity: 1;
+/* Touch devices get the always-visible default above (no hover to reveal
+   it otherwise); only hide-until-hover on a real mouse/trackpad. */
+@media (hover: hover) and (pointer: fine) {
+  .song-row-menu .song-menu-trigger {
+    opacity: 0;
+  }
+  .song-row:hover .song-row-menu .song-menu-trigger {
+    opacity: 1;
+  }
 }
 .song-row-menu .song-menu-popover {
   top: 100%;

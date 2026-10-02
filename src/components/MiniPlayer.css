@@ -5,7 +5,7 @@
   transform: translateX(-50%);
   width: calc(100% - 32px);
   max-width: 900px;
-  height: var(--mini-player-h);
+  height: var(--miniplayer-h);
   display: flex;
   align-items: center;
   gap: 16px;

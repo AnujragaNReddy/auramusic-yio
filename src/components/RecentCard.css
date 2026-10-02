@@ -38,12 +38,22 @@
   justify-content: center;
   background: rgba(0, 0, 0, 0.35);
   color: #fff;
-  opacity: 0;
+  opacity: 0.9;
   transition: opacity 0.15s ease;
 }
-.recent-card:hover .recent-card-play,
 .recent-card.active .recent-card-play {
   opacity: 1;
+}
+/* Touch devices get the always-visible default above (no hover to reveal
+   it otherwise); only hide-until-hover on a real mouse/trackpad. */
+@media (hover: hover) and (pointer: fine) {
+  .recent-card-play {
+    opacity: 0;
+  }
+  .recent-card:hover .recent-card-play,
+  .recent-card.active .recent-card-play {
+    opacity: 1;
+  }
 }
 
 .recent-card-text {

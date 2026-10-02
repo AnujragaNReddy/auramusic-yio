@@ -153,14 +153,22 @@
 }
 .track-like {
   flex-shrink: 0;
-  opacity: 0;
+  opacity: 0.85;
 }
-.playlist-track-row:hover .track-like,
 .track-like.liked {
   opacity: 1;
-}
-.track-like.liked {
   color: var(--accent);
+}
+/* Touch devices get the always-visible default above (no hover to reveal
+   it otherwise); only hide-until-hover on a real mouse/trackpad. */
+@media (hover: hover) and (pointer: fine) {
+  .track-like {
+    opacity: 0;
+  }
+  .playlist-track-row:hover .track-like,
+  .track-like.liked {
+    opacity: 1;
+  }
 }
 .bookmark-check,
 .saved {
